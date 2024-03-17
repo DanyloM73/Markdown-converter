@@ -140,3 +140,5 @@ Now we are in paragraph2
 Роботу виконав Маланін Данило, студент групи ІМ-21.
 
 [Посилання на провалений тест](https://github.com/DanyloM73/Markdown-converter/commit/20efc235c3e0a5bf975db39e886f90e1ca191735)
+
+[Посилання на revert-коміт](https://github.com/DanyloM73/Markdown-converter/commit/6875fdc3157166cf8234f7dd87d779bffe166b0e)
