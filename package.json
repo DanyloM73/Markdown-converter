@@ -1,0 +1,22 @@
+{
+  "name": "markdown-converter",
+  "version": "1.0.0",
+  "description": "converting Markdown to HTML or ANSI Escape Codes",
+  "main": "main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanyloM73/Markdown-converter.git"
+  },
+  "author": "Danylo Malanin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DanyloM73/Markdown-converter/issues"
+  },
+  "homepage": "https://github.com/DanyloM73/Markdown-converter#readme",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
