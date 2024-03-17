@@ -31,24 +31,24 @@ const joinLines = (lines, format) => {
     return result.trim();
 }
 
-const checkSpecialChars = (htmlString) => {
+const checkSpecialChars = (formatString) => {
     const specialChars = ['**', '_', '`'];
     for (let char of specialChars) {
-        if (htmlString.includes(char)) {
-            throw `Invalid markdown in line: ${htmlString}`;
+        if (formatString.includes(char)) {
+            throw `Invalid markdown in line: ${formatString}`;
         }
     }
-    return htmlString;
+    return formatString;
 }
 
 
-const markdownToHtml = (markdown, format) => {
+const markdownToFormat = (markdown, format) => {
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
   const lines = normalizedMarkdown.split('\n');
 
   let inPreBlock = false;
   let inParagraph = false;
-  let htmlArray = lines.map(line => {
+  let formatLinesArray = lines.map(line => {
       if (isPreBlock(line)) {
           inPreBlock = !inPreBlock;
           return inPreBlock ? `${formatTags[format].pre[0]}` : `${formatTags[format].pre[1]}`;
@@ -67,9 +67,9 @@ const markdownToHtml = (markdown, format) => {
       return checkSpecialChars(formatLine(line, format), format);
   });
   if (inParagraph) {
-      htmlArray.push(`${formatTags[format].p[1]}`);
+      formatLinesArray.push(`${formatTags[format].p[1]}`);
   }
-  return joinLines(htmlArray, format);
+  return joinLines(formatLinesArray, format);
 }
 
-module.exports = markdownToHtml;
+module.exports = markdownToFormat;

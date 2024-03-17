@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const markdownToHTML = require('./markdownToHTML');
+const markdownToFormat = require('./markdownToFormat');
 
 const convertFile = (inputPath, outputPath = null, format) => {
   fs.readFile(inputPath, 'utf8', (err, data) => {
@@ -11,17 +11,17 @@ const convertFile = (inputPath, outputPath = null, format) => {
       }
 
       try {
-          const html = markdownToHTML(data, format);
+          const result = markdownToFormat(data, format);
 
           if (outputPath) {
-              fs.writeFile(outputPath, html, (err) => {
+              fs.writeFile(outputPath, result, (err) => {
                   if (err) {
                       console.error(`Error writing file: ${err}`);
                       process.exit(1);
                   }
               });
           } else {
-              console.log(html);
+              console.log(result);
           }
       } catch (err) {
           console.error(`Error converting markdown to ${format}: ${err}`);
