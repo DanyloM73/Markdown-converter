@@ -140,5 +140,3 @@ Now we are in paragraph2
 Роботу виконав Маланін Данило, студент групи ІМ-21.
 
 [Посилання на провалений тест](https://github.com/DanyloM73/Markdown-converter/commit/20efc235c3e0a5bf975db39e886f90e1ca191735)
-
-Some unnecessary text (●__● )
