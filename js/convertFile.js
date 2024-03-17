@@ -3,7 +3,7 @@
 const fs = require('fs');
 const markdownToHTML = require('./markdownToHTML');
 
-const convertFile = (inputPath, outputPath = null) => {
+const convertFile = (inputPath, outputPath = null, format) => {
   fs.readFile(inputPath, 'utf8', (err, data) => {
       if (err) {
           console.error(`Error reading file: ${err}`);
@@ -11,7 +11,7 @@ const convertFile = (inputPath, outputPath = null) => {
       }
 
       try {
-          const html = markdownToHTML(data);
+          const html = markdownToHTML(data, format);
 
           if (outputPath) {
               fs.writeFile(outputPath, html, (err) => {
@@ -24,7 +24,7 @@ const convertFile = (inputPath, outputPath = null) => {
               console.log(html);
           }
       } catch (err) {
-          console.error(`Error converting markdown to HTML: ${err}`);
+          console.error(`Error converting markdown to ${format}: ${err}`);
           process.exit(1);
       }
   });

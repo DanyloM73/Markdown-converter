@@ -1,26 +1,28 @@
 'use strict';
 
+const formatTags = require('./formatTags');
+
 const isPreBlock = (line) => line.startsWith('```');
 
 const isEmptyLine = (line) => line.trim() === '';
 
 const shouldStartParagraph = (line, inParagraph) => !inParagraph && /^[a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ]/.test(line);
 
-const formatLine = (line) => {
-    const boldRegex = /(?<![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])\*\*(.*?)\*\*(?![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])/g;
-    const italicRegex = /(?<![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])_(.*?)_(?![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])/g;
-    const codeRegex = /(?<![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])\`(.*?)\`(?![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])/g;
+const formatLine = (line, format) => {
+    const boldRegex = /(?<![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])\*\*([^_\`]*)\*\*(?![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])/g;
+    const italicRegex = /(?<![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])_([^\*\`]*)_(?![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])/g;
+    const codeRegex = /(?<![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])\`([^\*_]*)\`(?![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])/g;
 
     return line
-        .replace(boldRegex, '<b>$1</b>')
-        .replace(italicRegex, '<i>$1</i>')
-        .replace(codeRegex, '<tt>$1</tt>');
+        .replace(boldRegex, `${formatTags[format].bold[0]}$1${formatTags[format].bold[1]}`)
+        .replace(italicRegex, `${formatTags[format].italic[0]}$1${formatTags[format].italic[1]}`)
+        .replace(codeRegex, `${formatTags[format].code[0]}$1${formatTags[format].code[1]}`);
 }
 
-const joinLines = (lines) => {
+const joinLines = (lines, format) => {
     let result = '';
     for (let i = 0; i < lines.length; i++) {
-        if (lines[i] === '</p>' && i > 0) {
+        if (lines[i] === `${formatTags[format].p[1]}` && i > 0) {
             result = result.trim() + lines[i] + '\n';
         } else {
             result += lines[i] + '\n';
@@ -30,18 +32,17 @@ const joinLines = (lines) => {
 }
 
 const checkSpecialChars = (htmlString) => {
-    const specialChars = ['\\*\\*', '_', '`'];
+    const specialChars = ['**', '_', '`'];
     for (let char of specialChars) {
-        let regex = new RegExp(`(?<![a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])(${char})([a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])`, 'g');
-        if (regex.test(htmlString) || htmlString.includes('><')) {
-            console.error(`Invalid markdown in line: ${htmlString}`);
-            process.exit(1);
+        if (htmlString.includes(char)) {
+            throw `Invalid markdown in line: ${htmlString}`;
         }
     }
     return htmlString;
 }
 
-const markdownToHtml = (markdown) => {
+
+const markdownToHtml = (markdown, format) => {
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
   const lines = normalizedMarkdown.split('\n');
 
@@ -50,25 +51,25 @@ const markdownToHtml = (markdown) => {
   let htmlArray = lines.map(line => {
       if (isPreBlock(line)) {
           inPreBlock = !inPreBlock;
-          return inPreBlock ? '<pre>' : '</pre>';
+          return inPreBlock ? `${formatTags[format].pre[0]}` : `${formatTags[format].pre[1]}`;
       }
       if (inPreBlock) {
           return line;
       }
       if (isEmptyLine(line)) {
           inParagraph = false;
-          return '</p>';
+          return `${formatTags[format].p[1]}`;
       }
       if (shouldStartParagraph(line, inParagraph)) {
           inParagraph = true;
-          return '<p>' + checkSpecialChars(formatLine(line));
+          return `${formatTags[format].p[0]}` + checkSpecialChars(formatLine(line, format), format);
       }
-      return checkSpecialChars(formatLine(line));
+      return checkSpecialChars(formatLine(line, format), format);
   });
   if (inParagraph) {
-      htmlArray.push('</p>');
+      htmlArray.push(`${formatTags[format].p[1]}`);
   }
-  return joinLines(htmlArray);
+  return joinLines(htmlArray, format);
 }
 
 module.exports = markdownToHtml;
