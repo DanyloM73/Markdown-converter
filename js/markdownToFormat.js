@@ -31,16 +31,31 @@ const joinLines = (lines, format) => {
     return result.trim();
 }
 
-const checkSpecialChars = (formatString) => {
+const checkNestedSpecialChars = (line) => {
     const specialChars = ['**', '_', '`'];
-    for (let char of specialChars) {
-        if (formatString.includes(char)) {
-            throw `Invalid markdown in line: ${formatString}`;
+    for (let i = 0; i < line.length - 1; i++) {
+        if (specialChars.includes(line[i]) && specialChars.includes(line[i + 1])) {
+            throw `Invalid markdown in line: ${line}`;
         }
     }
-    return formatString;
+    return checkNoEndSpecialChars(line);
 }
 
+const checkNoEndSpecialChars = (line) => {
+    const specialChars = ['**', '_', '`'];
+    for (let char of specialChars) {
+        let index = line.indexOf(char);
+        while (index !== -1) {
+            if ((index === 0 || line[index - 1] === ' ') && /[a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ]/.test(line[index + char.length])) {
+                if (line.indexOf(char, index + char.length) === -1) {
+                    throw `Invalid markdown in line: ${line}`;
+                }
+            }
+            index = line.indexOf(char, index + char.length);
+        }
+    }
+    return line;
+}
 
 const markdownToFormat = (markdown, format) => {
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
@@ -62,9 +77,9 @@ const markdownToFormat = (markdown, format) => {
       }
       if (shouldStartParagraph(line, inParagraph)) {
           inParagraph = true;
-          return `${formatTags[format].p[0]}` + checkSpecialChars(formatLine(line, format), format);
+          return `${formatTags[format].p[0]}` + formatLine(checkNestedSpecialChars(line), format);
       }
-      return checkSpecialChars(formatLine(line, format), format);
+      return formatLine(checkNestedSpecialChars(line), format);
   });
   if (inParagraph) {
       formatLinesArray.push(`${formatTags[format].p[1]}`);

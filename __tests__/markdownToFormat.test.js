@@ -32,13 +32,9 @@ describe('markdownToFormat', () => {
   it('should handle invalid syntax', () => {
     const markdownNested = '**`_nested_`**';
     const markdownNoEnd = '_no end';
-    const expectedHtmlNestedError = 'Invalid markdown in line: **<tt><i>nested</i></tt>**';
-    const expectedHtmlNoEndError = 'Invalid markdown in line: _no end';
-    const expectedAnsiNestedError = 'Invalid markdown in line: **\x1b[7m\x1b[3mnested\x1b[23m\x1b[27m**';
-    const expectedAnsiNoEndError = 'Invalid markdown in line: _no end';
-    expect(() => markdownToFormat(markdownNested, 'html')).toThrow(expectedHtmlNestedError);
-    expect(() => markdownToFormat(markdownNoEnd, 'html')).toThrow(expectedHtmlNoEndError);
-    expect(() => markdownToFormat(markdownNested, 'ansi')).toThrow(expectedAnsiNestedError);
-    expect(() => markdownToFormat(markdownNoEnd, 'ansi')).toThrow(expectedAnsiNoEndError);
+    const expectedNestedError = 'Invalid markdown in line: **`_nested_`**';
+    const expectedNoEndError = 'Invalid markdown in line: _no end';
+    expect(() => markdownToFormat(markdownNested, 'ansi')).toThrow(expectedNestedError);
+    expect(() => markdownToFormat(markdownNoEnd, 'ansi')).toThrow(expectedNoEndError);
   })
 });
